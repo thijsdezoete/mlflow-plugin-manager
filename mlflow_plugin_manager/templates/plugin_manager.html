@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLflow Plugin Manager</title>
+    <link rel="stylesheet" href="{{ url_for('custom_static', filename='style.css') }}">
+
+</head>
+<body>
+    <h1>MLflow Plugin Manager</h1>
+    <h2>Installed Plugins:</h2>
+    <ul id="installed-plugins">
+        <!-- JavaScript will populate this list -->
+    </ul>
+
+    <button id="check-updates-btn">Check for Updates</button>
+    <div id="update-results"></div>
+
+    <h2>Available Plugins:</h2>
+    <ul id="available-plugins">
+        <!-- JavaScript will populate this list -->
+    </ul>
+
+
+<script src="{{ url_for('custom_static', filename='script.js') }}"></script>
+</body>
+</html>
+

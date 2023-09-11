@@ -1,0 +1,25 @@
+    <div class="container">
+        <h2>Login</h2>
+        <form method="post">
+            {{ form.hidden_tag() }} <!-- CSRF token -->
+
+            <div class="form-group">
+                <label for="{{ form.username.id }}">Username</label>
+                {{ form.username(class="form-control", placeholder="Enter username") }}
+                {% if form.username.errors %}
+                    <span class="text-danger">{{ form.username.errors[0] }}</span>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.password.id }}">Password</label>
+                {{ form.password(class="form-control", placeholder="Enter password") }}
+                {% if form.password.errors %}
+                    <span class="text-danger">{{ form.password.errors[0] }}</span>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+    </div>
+
