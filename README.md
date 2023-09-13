@@ -27,6 +27,17 @@ cd mlflow-plugin-manager
 pip install -e .
 ```
 
+Then make sure you fill the database with plugins:
+```bash
+cd server
+python reindex_plugins.py
+```
+
+After that's done, just run the server:
+```bash
+python app.py
+```
+
 # Usage
 
 To run the MLflow server with the Plugin Manager, use the following command:
