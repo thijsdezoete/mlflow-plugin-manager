@@ -35,6 +35,7 @@ python reindex_plugins.py
 
 After that's done, just run the server:
 ```bash
+cd server
 python app.py
 ```
 
