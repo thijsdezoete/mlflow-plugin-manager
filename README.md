@@ -10,13 +10,16 @@ Welcome to the MLflow Plugin Manager, inspired by wbond's package manager for Su
 - 🗑 **Uninstall** plugins you no longer need.
 - 🌐 Direct integration into the MLflow web interface.
 
+Preview
+![preview functionality](https://github.com/thijsdezoete/mlflow-plugin-manager/blob/master/media/mlflow-plugin.gif?raw=true)
+
 ## Installation
 
-1. Clone this repository:
-   ```bash
-   git clone git@github.com:thijsdezoete/mlflow-plugin-manager.git
+Clone this repository:
+```bash
+git clone git@github.com:thijsdezoete/mlflow-plugin-manager.git
+```
 
-    ```
 Navigate to the cloned directory and install the package:
 
 ```bash

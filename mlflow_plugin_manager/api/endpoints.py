@@ -14,11 +14,9 @@ def index():
 @plugin_api.route('/available-plugins', methods=['GET'])
 def available_plugins():
     try:
-        print("available")
         response = requests.get("http://localhost:5001/browse-plugins")
-        print(response)
-        print(response)
         # response = requests.get("https://plugin.mlflowplugins.com/browse-plugins")
+
         if response.status_code == 200:
             plugins = list([{'name': plugin['name'], "version": plugin['version']} for plugin in response.json()])
             return jsonify(plugins)
@@ -31,23 +29,19 @@ def available_plugins():
 @plugin_api.route('/installed-plugins', methods=['GET'])
 def installed_plugins():
     try:
-        # Run pip freeze to get a list of installed packages
         result = subprocess.run(["pip", "freeze"], check=True, text=True, capture_output=True)
         installed_packages = result.stdout.splitlines()
 
         def extract_name_version(pkg_str):
             if '==' in pkg_str:
-                # Standard package format
                 name, version = pkg_str.split('==')
                 return {"name": name, "version": version}
             elif "#egg=" in pkg_str:
-                # Editable mode format
                 name = pkg_str.split("#egg=")[-1]
-                # Extracting git commit hash as version
+
                 version = pkg_str.split('@')[-1].split('#')[0]
                 return {"name": name, "version": version}
             else:
-                # If the format isn't recognized, return None
                 return None
 
         mlflow_plugins = [extract_name_version(pkg) for pkg in installed_packages if 'mlflow-' in pkg and '-plugin' in pkg]
@@ -57,7 +51,6 @@ def installed_plugins():
         
         all_plugins = mlflow_plugins + plugin_mlflow + mlflow_plugins_non_conformative
 
-        # Use a dict to ensure uniqueness of plugin names
         unique_plugins = {}
         for plugin in all_plugins:
             unique_plugins[plugin["name"]] = plugin
@@ -77,12 +70,10 @@ def install_plugin():
     if not plugin_name:
         return jsonify({"error": "Plugin name is required."}), 400
 
-    # Check if the plugin is approved
     # response = requests.get(f"https://plugin.mlflowplugins.com/is-approved?name={plugin_name}")
     # if response.status_code != 200 or not response.json().get("approved"):
     #     return jsonify({"error": f"Plugin {plugin_name} is not approved for installation."}), 403
 
-    # # If approved, proceed with installation
     try:
         result = subprocess.run(["pip", "install", plugin_name], check=True, text=True, capture_output=True)
         return jsonify({"message": f"Successfully installed {plugin_name}!\n{result.stdout}"}), 200
@@ -97,14 +88,11 @@ def uninstall_plugin():
     if not plugin_name:
         return jsonify({"error": "Plugin name is required."}), 400
 
-    # Before uninstalling, check if the plugin is in the list of installed plugins.
     installed = installed_plugins()
-    print(installed)
     installed_names = [x['name'] for x in installed.json]
     if plugin_name not in installed_names:
         return jsonify({"error": f"Plugin {plugin_name} is not installed."}), 404
 
-    # If the plugin is installed, proceed with uninstallation
     try:
         result = subprocess.run(["pip", "uninstall", "-y", plugin_name], check=True, text=True, capture_output=True)
         return jsonify({"message": f"Successfully uninstalled {plugin_name}!\n{result.stdout}"}), 200
@@ -116,7 +104,6 @@ def uninstall_plugin():
 @plugin_api.route('/check-plugin-updates', methods=['GET'])
 def check_plugin_updates():
     try:
-        # Get installed plugins
         installed = installed_plugins()
         if "error" in installed.json:
             return installed
