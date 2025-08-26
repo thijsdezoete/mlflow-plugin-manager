@@ -1,0 +1,32 @@
+# Include documentation and license
+include README.md
+include LICENSE
+
+# Include all template and static files
+recursive-include mlflow_plugin_manager/templates *.html
+recursive-include mlflow_plugin_manager/static *.js *.css *.html
+
+# Include the package data
+recursive-include mlflow_plugin_manager *.json *.yml *.yaml
+
+# Exclude unnecessary files
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]
+recursive-exclude * .DS_Store
+
+# Exclude development directories
+prune server
+prune docs
+prune landing
+prune mlruns
+prune build
+prune dist
+prune .git
+prune .pytest_cache
+prune *.egg-info
+
+# Exclude database and log files
+global-exclude *.db
+global-exclude *.log
+global-exclude *.sqlite
+global-exclude *.pid

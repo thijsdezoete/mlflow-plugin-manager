@@ -4,26 +4,933 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MLflow Plugin Manager</title>
-    <link rel="stylesheet" href="{{ url_for('custom_static', filename='style.css') }}">
-
+    <link rel="stylesheet" href="{{ url_for('custom_static', filename='mlflow-style.css') }}">
 </head>
 <body>
-    <h1>MLflow Plugin Manager</h1>
-    <h2>Installed Plugins:</h2>
-    <ul id="installed-plugins">
-        <!-- JavaScript will populate this list -->
-    </ul>
+    <div class="plugin-container">
+        <!-- Header - MLflow 3 Style -->
+        <div class="plugin-header">
+            <h1>
+                <svg class="logo" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L2 7L2 17L12 22L22 17V7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 22V12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M22 7L12 12L2 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Plugin Manager
+            </h1>
+            <a href="/#/experiments" class="back-button">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10 12L6 8L10 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Back to MLflow
+            </a>
+        </div>
 
-    <button id="check-updates-btn">Check for Updates</button>
-    <div id="update-results"></div>
+        <!-- Main Content -->
+        <div class="plugin-content">
+            <!-- Page Title -->
+            <h2 class="page-title">Plugins</h2>
 
-    <h2>Available Plugins:</h2>
-    <ul id="available-plugins">
-        <!-- JavaScript will populate this list -->
-    </ul>
+            <!-- Stats Bar -->
+            <div class="stats-bar">
+                <div class="stat-card">
+                    <div class="stat-value" id="installed-count">0</div>
+                    <div class="stat-label">Installed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="available-count">0</div>
+                    <div class="stat-label">Available</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="updates-count">0</div>
+                    <div class="stat-label">Updates</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="total-count">0</div>
+                    <div class="stat-label">Total Plugins</div>
+                </div>
+            </div>
 
+            <!-- Search Section -->
+            <div class="search-section">
+                <div class="search-bar">
+                    <input type="text" class="search-input" id="plugin-search" placeholder="Filter plugins by name">
+                </div>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="installed">Installed</button>
+                    <button class="filter-btn" data-filter="available">Available</button>
+                    <button class="filter-btn" data-filter="updates">Updates Available</button>
+                    <button class="filter-btn" data-filter="popular">Popular</button>
+                </div>
+            </div>
 
-<script src="{{ url_for('custom_static', filename='script.js') }}"></script>
+            <!-- Installed Plugins Section -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h2 class="section-title">Installed Plugins</h2>
+                    <div class="section-actions">
+                        <button class="btn btn-secondary" id="check-updates-btn">
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M14 8C14 4.68629 11.3137 2 8 2C5.5 2 3.36829 3.49238 2.52817 5.65M2 2V6H6M2 8C2 11.3137 4.68629 14 8 14C10.5 14 12.6317 12.5076 13.4718 10.35M14 14V10H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Check for Updates
+                        </button>
+                    </div>
+                </div>
+                <div id="update-results"></div>
+                <div class="plugin-grid" id="installed-plugins">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Available Plugins Section -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h2 class="section-title">Available Plugins</h2>
+                    <div class="section-actions">
+                        <button class="btn btn-secondary" id="refresh-available-btn">
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M14 8C14 4.68629 11.3137 2 8 2C5.5 2 3.36829 3.49238 2.52817 5.65M2 2V6H6M2 8C2 11.3137 4.68629 14 8 14C10.5 14 12.6317 12.5076 13.4718 10.35M14 14V10H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+                <div class="plugin-grid" id="available-plugins">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notification-container"></div>
+
+    <!-- Plugin Detail Modal -->
+    <div id="plugin-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-plugin-name">Plugin Name</h2>
+                <button class="modal-close" onclick="closePluginModal()">
+                    <svg width="20" height="20" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="plugin-detail-section">
+                    <h3>Description</h3>
+                    <p id="modal-plugin-description">No description available</p>
+                </div>
+                
+                <div class="plugin-detail-section">
+                    <h3>Package Information</h3>
+                    <div class="plugin-info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Current Version:</span>
+                            <span id="modal-current-version">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Latest Version:</span>
+                            <span id="modal-latest-version">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Author:</span>
+                            <span id="modal-author">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">License:</span>
+                            <span id="modal-license">-</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="plugin-detail-section">
+                    <h3>Version Selection</h3>
+                    <div class="version-selector">
+                        <select id="modal-version-select" class="version-dropdown">
+                            <option value="latest">Latest</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="plugin-detail-section">
+                    <h3>Links</h3>
+                    <div class="plugin-links">
+                        <a id="modal-pypi-link" href="#" target="_blank" class="plugin-link">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M7.33333 1.33333H5.33333C2.38781 1.33333 1.33333 2.38781 1.33333 5.33333V10.6667C1.33333 13.6122 2.38781 14.6667 5.33333 14.6667H10.6667C13.6122 14.6667 14.6667 13.6122 14.6667 10.6667V8.66667M10.6667 1.33333H14.6667M14.6667 1.33333V5.33333M14.6667 1.33333L8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            View on PyPI
+                        </a>
+                        <a id="modal-github-link" href="#" target="_blank" class="plugin-link" style="display:none;">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M8 1.33333C4.31333 1.33333 1.33333 4.31333 1.33333 8C1.33333 10.9533 3.24 13.4533 5.89333 14.32C6.22667 14.38 6.34667 14.1667 6.34667 13.9867V12.7467C4.48 13.14 4.08667 11.9133 4.08667 11.9133C3.78 11.1467 3.34 10.9333 3.34 10.9333C2.74667 10.5267 3.38667 10.5333 3.38667 10.5333C4.04667 10.58 4.39333 11.22 4.39333 11.22C4.96 12.2067 5.87333 11.94 6.36667 11.7667C6.42667 11.3267 6.6 11.02 6.79333 10.9533C5.26 10.7867 3.65333 10.2067 3.65333 7.58C3.65333 6.84667 3.91333 6.24667 4.40667 5.77333C4.34 5.60667 4.12 4.92 4.47333 4.01333C4.47333 4.01333 5 3.84 6.34667 4.70667C6.88 4.56 7.44 4.48667 8 4.48667C8.56 4.48667 9.12 4.56 9.65333 4.70667C11 3.83333 11.5267 4.01333 11.5267 4.01333C11.88 4.92 11.66 5.60667 11.5933 5.77333C12.0867 6.24667 12.3467 6.84 12.3467 7.58C12.3467 10.2133 10.7333 10.7867 9.2 10.9533C9.44 11.16 9.65333 11.5667 9.65333 12.1933V13.9867C9.65333 14.1667 9.77333 14.3867 10.1133 14.32C12.76 13.4533 14.6667 10.9533 14.6667 8C14.6667 4.31333 11.6867 1.33333 8 1.33333Z"/>
+                            </svg>
+                            View on GitHub
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="modal-action-btn" class="btn btn-primary" onclick="performPluginAction()">Install</button>
+                <button class="btn btn-secondary" onclick="closePluginModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirm-modal" class="modal" style="display: none;">
+        <div class="modal-content confirm-modal">
+            <div class="modal-header">
+                <h2 id="confirm-title">Confirm Action</h2>
+            </div>
+            <div class="modal-body">
+                <p id="confirm-message" class="confirm-message">Are you sure you want to proceed?</p>
+            </div>
+            <div class="modal-footer">
+                <button id="confirm-cancel-btn" class="btn btn-secondary" onclick="hideConfirmModal()">Cancel</button>
+                <button id="confirm-action-btn" class="btn btn-primary" onclick="confirmAction()">Confirm</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Log Output Modal -->
+    <div id="log-modal" class="modal" style="display: none;">
+        <div class="modal-content log-modal">
+            <div class="modal-header">
+                <h2 id="log-title">Operation Log</h2>
+                <button class="modal-close" onclick="closeLogModal()">
+                    <svg width="20" height="20" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <pre id="log-output" class="log-output"></pre>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeLogModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Enhanced plugin manager with MLflow 3 styling
+    document.addEventListener("DOMContentLoaded", function() {
+        let allPlugins = [];
+        let installedPlugins = [];
+        let currentFilter = 'all';
+        let confirmCallback = null;
+        
+        // Confirmation Modal Functions
+        window.showConfirmModal = function(title, message, onConfirm, confirmBtnText = 'Confirm', confirmBtnClass = 'btn-primary') {
+            document.getElementById('confirm-title').textContent = title;
+            document.getElementById('confirm-message').textContent = message;
+            
+            const confirmBtn = document.getElementById('confirm-action-btn');
+            confirmBtn.textContent = confirmBtnText;
+            confirmBtn.className = `btn ${confirmBtnClass}`;
+            
+            confirmCallback = onConfirm;
+            
+            const modal = document.getElementById('confirm-modal');
+            modal.style.display = 'flex';
+            
+            // Focus on cancel button for safety
+            document.getElementById('confirm-cancel-btn').focus();
+        };
+        
+        window.hideConfirmModal = function() {
+            document.getElementById('confirm-modal').style.display = 'none';
+            confirmCallback = null;
+        };
+        
+        window.confirmAction = function() {
+            if (confirmCallback) {
+                confirmCallback();
+            }
+            hideConfirmModal();
+        };
+        
+        // Close modal on backdrop click
+        document.getElementById('confirm-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideConfirmModal();
+            }
+        });
+        
+        // Keyboard support for confirmation modal
+        document.addEventListener('keydown', function(e) {
+            const modal = document.getElementById('confirm-modal');
+            if (modal.style.display === 'flex') {
+                if (e.key === 'Escape') {
+                    hideConfirmModal();
+                } else if (e.key === 'Enter') {
+                    confirmAction();
+                }
+            }
+        });
+        
+        // Log Modal Functions
+        window.showLogModal = function(title, content) {
+            document.getElementById('log-title').textContent = title;
+            document.getElementById('log-output').textContent = content;
+            document.getElementById('log-modal').style.display = 'flex';
+        };
+        
+        window.closeLogModal = function() {
+            document.getElementById('log-modal').style.display = 'none';
+        };
+        
+        // Close log modal on backdrop click
+        document.getElementById('log-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeLogModal();
+            }
+        });
+        
+        // Notification system
+        function showNotification(message, type = 'success') {
+            const container = document.getElementById('notification-container');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            container.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Current plugin detail for modal
+        let currentPluginDetail = null;
+        
+        // Create plugin card HTML
+        function createPluginCard(plugin, isInstalled = false) {
+            const card = document.createElement('div');
+            card.className = 'plugin-item';
+            card.dataset.name = plugin.name.toLowerCase();
+            card.dataset.plugin = JSON.stringify(plugin);
+            card.style.cursor = 'pointer';
+            
+            card.innerHTML = `
+                <div class="plugin-info" onclick="showPluginDetail('${plugin.name}', ${isInstalled})">
+                    <div class="plugin-name">${plugin.name}</div>
+                    <div class="plugin-version">Version: ${plugin.version}</div>
+                    ${plugin.description ? `<div class="plugin-description">${plugin.description}</div>` : ''}
+                </div>
+                <div class="plugin-actions">
+                    ${isInstalled ? 
+                        `<button class="btn btn-danger btn-sm" data-plugin-name="${plugin.name}" data-action="uninstall" onclick="event.stopPropagation(); uninstallPlugin('${plugin.name}')">Uninstall</button>` :
+                        `<button class="btn btn-primary btn-sm" data-plugin-name="${plugin.name}" data-action="install" onclick="event.stopPropagation(); installPlugin('${plugin.name}')">Install</button>`
+                    }
+                </div>
+            `;
+            
+            return card;
+        }
+        
+        // Update modal action button based on selection
+        function updateModalActionButton(isInstalled, currentVersion) {
+            const actionBtn = document.getElementById('modal-action-btn');
+            const selectedVersion = document.getElementById('modal-version-select').value;
+            
+            if (!isInstalled) {
+                actionBtn.textContent = 'Install';
+                actionBtn.className = 'btn btn-primary';
+                actionBtn.dataset.action = 'install';
+            } else {
+                if (selectedVersion && selectedVersion !== currentVersion) {
+                    actionBtn.textContent = 'Change Version';
+                    actionBtn.className = 'btn btn-warning';
+                    actionBtn.dataset.action = 'change-version';
+                } else {
+                    actionBtn.textContent = 'Uninstall';
+                    actionBtn.className = 'btn btn-danger';
+                    actionBtn.dataset.action = 'uninstall';
+                }
+            }
+        }
+        
+        // Change plugin version (uninstall current, install new)
+        window.changePluginVersion = function(pluginName, currentVersion, newVersion) {
+            const versionText = newVersion === 'latest' ? 'latest' : `version ${newVersion}`;
+            
+            showConfirmModal(
+                'Change Plugin Version',
+                `This will change ${pluginName} from version ${currentVersion} to ${versionText}. Continue?`,
+                function() {
+                    showNotification(`Changing ${pluginName} to ${versionText}...`, "success");
+                    
+                    // Disable plugin buttons
+                    document.querySelectorAll(`[data-plugin-name="${pluginName}"]`).forEach(btn => {
+                        btn.disabled = true;
+                        btn.classList.add('loading');
+                    });
+                    
+                    const modalBtn = document.getElementById('modal-action-btn');
+                    if (modalBtn && currentPluginDetail && currentPluginDetail.plugin.name === pluginName) {
+                        modalBtn.disabled = true;
+                        modalBtn.classList.add('loading');
+                    }
+                    
+                    // First uninstall current version
+                    fetch(`/plugin-manager/uninstall-plugin?name=${pluginName}`, {
+                        method: 'POST'
+                    })
+                    .then(response => response.json())
+                    .then(uninstallData => {
+                        if (uninstallData.error) {
+                            throw new Error(uninstallData.error);
+                        }
+                        
+                        // Then install new version
+                        let installUrl = `/plugin-manager/install-plugin?name=${pluginName}`;
+                        if (newVersion !== 'latest') {
+                            installUrl += `&version=${newVersion}`;
+                        }
+                        
+                        return fetch(installUrl, {
+                            method: 'POST'
+                        });
+                    })
+                    .then(response => response.json())
+                    .then(installData => {
+                        if (installData.error) {
+                            showNotification(installData.error, "error");
+                            showLogModal(`Version Change Failed: ${pluginName}`, installData.error);
+                        } else {
+                            showNotification(`Successfully changed ${pluginName} to ${versionText}!`, "success");
+                            
+                            // Show version change log if available
+                            if (installData.message) {
+                                showLogModal(`Version Change Success: ${pluginName}`, installData.message);
+                            }
+                            
+                            // Refresh plugin lists
+                            fetchInstalledPlugins().then(() => {
+                                fetchAvailablePlugins();
+                            });
+                            
+                            // Close plugin detail modal after successful change
+                            closePluginModal();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error changing plugin version:', error);
+                        showNotification(`Failed to change ${pluginName} version: ${error.message}`, "error");
+                    })
+                    .finally(() => {
+                        // Re-enable buttons
+                        document.querySelectorAll(`[data-plugin-name="${pluginName}"]`).forEach(btn => {
+                            btn.disabled = false;
+                            btn.classList.remove('loading');
+                        });
+                        
+                        if (modalBtn && currentPluginDetail && currentPluginDetail.plugin.name === pluginName) {
+                            modalBtn.disabled = false;
+                            modalBtn.classList.remove('loading');
+                        }
+                    });
+                },
+                'Change Version',
+                'btn-warning'
+            );
+        };
+        
+        // Show plugin detail modal
+        window.showPluginDetail = function(pluginName, isInstalled) {
+            // Find the plugin data
+            const allPluginsList = [...installedPlugins, ...allPlugins];
+            const plugin = allPluginsList.find(p => p.name === pluginName);
+            
+            if (!plugin) {
+                showNotification('Plugin details not found', 'error');
+                return;
+            }
+            
+            currentPluginDetail = { plugin, isInstalled };
+            
+            // Update modal content
+            document.getElementById('modal-plugin-name').textContent = plugin.name;
+            document.getElementById('modal-plugin-description').textContent = plugin.description || 'No description available';
+            document.getElementById('modal-current-version').textContent = plugin.version;
+            document.getElementById('modal-author').textContent = plugin.author || '-';
+            document.getElementById('modal-license').textContent = plugin.license || '-';
+            
+            // Update PyPI link
+            document.getElementById('modal-pypi-link').href = `https://pypi.org/project/${plugin.name}/`;
+            
+            // Update action button
+            const actionBtn = document.getElementById('modal-action-btn');
+            const versionSelect = document.getElementById('modal-version-select');
+            
+            // Always show version selector
+            versionSelect.parentElement.style.display = 'block';
+            
+            // Fetch available versions for all plugins
+            fetch(`/plugin-manager/plugin-versions/${plugin.name}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.versions) {
+                        // Clear existing options
+                        versionSelect.innerHTML = '';
+                        
+                        // If not installed, add a "Latest" option
+                        if (!isInstalled) {
+                            const latestOption = document.createElement('option');
+                            latestOption.value = 'latest';
+                            latestOption.textContent = 'Latest';
+                            versionSelect.appendChild(latestOption);
+                        }
+                        
+                        // Add version options
+                        data.versions.forEach(version => {
+                            const option = document.createElement('option');
+                            option.value = version;
+                            
+                            if (isInstalled && version === plugin.version) {
+                                option.textContent = `${version} (current)`;
+                                option.selected = true;
+                            } else if (version === data.latest) {
+                                option.textContent = `${version} (latest)`;
+                            } else {
+                                option.textContent = version;
+                            }
+                            
+                            versionSelect.appendChild(option);
+                        });
+                        
+                        // Update latest version display
+                        document.getElementById('modal-latest-version').textContent = data.latest || plugin.version;
+                        
+                        // Set initial button state
+                        updateModalActionButton(isInstalled, plugin.version);
+                    }
+                })
+                .catch(error => {
+                    console.error('Failed to fetch plugin versions:', error);
+                    // Keep default option if fetch fails
+                    versionSelect.innerHTML = '<option value="latest">Latest</option>';
+                    document.getElementById('modal-latest-version').textContent = plugin.version;
+                    updateModalActionButton(isInstalled, plugin.version);
+                });
+            
+            // Add event listener for version selection changes
+            versionSelect.onchange = function() {
+                if (isInstalled) {
+                    updateModalActionButton(true, plugin.version);
+                }
+            };
+            
+            // Show modal
+            document.getElementById('plugin-modal').style.display = 'flex';
+        };
+        
+        // Close plugin modal
+        window.closePluginModal = function() {
+            document.getElementById('plugin-modal').style.display = 'none';
+            currentPluginDetail = null;
+        };
+        
+        // Perform plugin action from modal
+        window.performPluginAction = function() {
+            if (!currentPluginDetail) return;
+            
+            const { plugin, isInstalled } = currentPluginDetail;
+            const selectedVersion = document.getElementById('modal-version-select').value;
+            const actionBtn = document.getElementById('modal-action-btn');
+            const action = actionBtn.dataset.action;
+            
+            closePluginModal();
+            
+            if (action === 'change-version') {
+                // Handle version change
+                changePluginVersion(plugin.name, plugin.version, selectedVersion);
+            } else if (action === 'uninstall') {
+                // Handle uninstall
+                uninstallPlugin(plugin.name);
+            } else if (action === 'install') {
+                // Handle install with specific version
+                installPlugin(plugin.name, selectedVersion);
+            }
+        };
+        
+        // Close modal when clicking outside
+        document.getElementById('plugin-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePluginModal();
+            }
+        });
+        
+        // Update total plugin count
+        function updateTotalCount() {
+            const installedCount = parseInt(document.getElementById('installed-count').textContent) || 0;
+            const availableCount = parseInt(document.getElementById('available-count').textContent) || 0;
+            document.getElementById('total-count').textContent = installedCount + availableCount;
+        }
+        
+        // Fetch and display installed plugins - returns a promise
+        function fetchInstalledPlugins() {
+            return fetch('/plugin-manager/installed-plugins')
+                .then(response => response.json())
+                .then(data => {
+                    installedPlugins = data;
+                    const container = document.getElementById('installed-plugins');
+                    container.innerHTML = '';
+                    
+                    if (data.length === 0) {
+                        container.innerHTML = `
+                            <div class="empty-state">
+                                <svg class="empty-state-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M20 7H4C2.89543 7 2 7.89543 2 9V19C2 20.1046 2.89543 21 4 21H20C21.1046 21 22 20.1046 22 19V9C22 7.89543 21.1046 7 20 7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M16 21V5C16 3.89543 15.1046 3 14 3H10C8.89543 3 8 3.89543 8 5V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <p>No plugins installed yet</p>
+                            </div>
+                        `;
+                    } else {
+                        data.forEach(plugin => {
+                            container.appendChild(createPluginCard(plugin, true));
+                        });
+                    }
+                    
+                    // Update stats
+                    document.getElementById('installed-count').textContent = data.length;
+                    updateTotalCount();
+                })
+                .catch(error => {
+                    console.error("Error fetching installed plugins:", error);
+                    showNotification("Failed to load installed plugins", "error");
+                });
+        }
+        
+        // Fetch and display available plugins - returns a promise
+        function fetchAvailablePlugins() {
+            return fetch('/plugin-manager/available-plugins')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        showNotification(data.error, "error");
+                        return;
+                    }
+                    
+                    allPlugins = data;
+                    const container = document.getElementById('available-plugins');
+                    container.innerHTML = '';
+                    
+                    // Filter out already installed plugins
+                    const availableOnly = data.filter(plugin => 
+                        !installedPlugins.some(installed => installed.name === plugin.name)
+                    );
+                    
+                    if (availableOnly.length === 0) {
+                        container.innerHTML = `
+                            <div class="empty-state">
+                                <svg class="empty-state-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <p>All available plugins are installed!</p>
+                            </div>
+                        `;
+                    } else {
+                        availableOnly.forEach(plugin => {
+                            container.appendChild(createPluginCard(plugin, false));
+                        });
+                    }
+                    
+                    // Update stats
+                    document.getElementById('available-count').textContent = data.length;
+                    updateTotalCount();
+                })
+                .catch(error => {
+                    console.error("Error fetching available plugins:", error);
+                    showNotification("Failed to load available plugins", "error");
+                });
+        }
+        
+        // Install plugin
+        window.installPlugin = function(pluginName, version) {
+            const versionText = version && version !== 'latest' ? ` version ${version}` : '';
+            
+            showConfirmModal(
+                'Install Plugin',
+                `Are you sure you want to install ${pluginName}${versionText}?`,
+                function() {
+                    // Show loading state
+                    showNotification(`Installing ${pluginName}${versionText}...`, "success");
+                    
+                    let url = `/plugin-manager/install-plugin?name=${pluginName}`;
+                    if (version && version !== 'latest') {
+                        url += `&version=${version}`;
+                    }
+                    
+                    // Disable only this plugin's buttons during operation
+                    document.querySelectorAll(`[data-plugin-name="${pluginName}"]`).forEach(btn => {
+                        btn.disabled = true;
+                        btn.classList.add('loading');
+                    });
+                    
+                    // Also disable modal action button if it's for this plugin
+                    const modalBtn = document.getElementById('modal-action-btn');
+                    if (modalBtn && currentPluginDetail && currentPluginDetail.plugin.name === pluginName) {
+                        modalBtn.disabled = true;
+                        modalBtn.classList.add('loading');
+                    }
+                    
+                    fetch(url, {
+                        method: 'POST'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            showNotification(data.error, "error");
+                            showLogModal(`Installation Failed: ${pluginName}`, data.error);
+                        } else {
+                            showNotification(`Successfully installed ${pluginName}${versionText}!`, "success");
+                            
+                            // Show installation log if available
+                            if (data.message) {
+                                showLogModal(`Installation Success: ${pluginName}`, data.message);
+                            }
+                            
+                            // Important: Fetch installed plugins first, then available
+                            // This ensures the available list properly filters out newly installed plugin
+                            fetchInstalledPlugins().then(() => {
+                                // Now fetch available plugins after installed list is updated
+                                fetchAvailablePlugins();
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error(`Error installing plugin ${pluginName}:`, error);
+                        showNotification(`Failed to install ${pluginName}`, "error");
+                    })
+                    .finally(() => {
+                        // Re-enable only this plugin's buttons
+                        document.querySelectorAll(`[data-plugin-name="${pluginName}"]`).forEach(btn => {
+                            btn.disabled = false;
+                            btn.classList.remove('loading');
+                        });
+                        
+                        // Re-enable modal button
+                        if (modalBtn && currentPluginDetail && currentPluginDetail.plugin.name === pluginName) {
+                            modalBtn.disabled = false;
+                            modalBtn.classList.remove('loading');
+                        }
+                    });
+                },
+                'Install',
+                'btn-primary'
+            );
+        };
+        
+        // Uninstall plugin
+        window.uninstallPlugin = function(pluginName) {
+            showConfirmModal(
+                'Uninstall Plugin',
+                `Are you sure you want to uninstall ${pluginName}? This action cannot be undone.`,
+                function() {
+                    // Show loading state
+                    showNotification(`Uninstalling ${pluginName}...`, "success");
+                    
+                    // Disable only this plugin's buttons during operation
+                    document.querySelectorAll(`[data-plugin-name="${pluginName}"]`).forEach(btn => {
+                        btn.disabled = true;
+                        btn.classList.add('loading');
+                    });
+                    
+                    // Also disable modal action button if it's for this plugin
+                    const modalBtn = document.getElementById('modal-action-btn');
+                    if (modalBtn && currentPluginDetail && currentPluginDetail.plugin.name === pluginName) {
+                        modalBtn.disabled = true;
+                        modalBtn.classList.add('loading');
+                    }
+                    
+                    fetch(`/plugin-manager/uninstall-plugin?name=${pluginName}`, {
+                        method: 'POST'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            showNotification(data.error, "error");
+                            showLogModal(`Uninstall Failed: ${pluginName}`, data.error);
+                        } else {
+                            showNotification(`Successfully uninstalled ${pluginName}!`, "success");
+                            
+                            // Show uninstall log if available
+                            if (data.message) {
+                                showLogModal(`Uninstall Success: ${pluginName}`, data.message);
+                            }
+                            
+                            // Refresh both lists - uninstalled plugin should move to available
+                            fetchInstalledPlugins().then(() => {
+                                fetchAvailablePlugins();
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error uninstalling plugin:', error);
+                        showNotification(`Failed to uninstall ${pluginName}`, "error");
+                    })
+                    .finally(() => {
+                        // Re-enable only this plugin's buttons
+                        document.querySelectorAll(`[data-plugin-name="${pluginName}"]`).forEach(btn => {
+                            btn.disabled = false;
+                            btn.classList.remove('loading');
+                        });
+                        
+                        // Re-enable modal button
+                        if (modalBtn && currentPluginDetail && currentPluginDetail.plugin.name === pluginName) {
+                            modalBtn.disabled = false;
+                            modalBtn.classList.remove('loading');
+                        }
+                    });
+                },
+                'Uninstall',
+                'btn-danger'
+            );
+        };
+        
+        // Check for updates
+        function checkForPluginUpdates() {
+            showNotification("Checking for updates...", "success");
+            
+            fetch("/plugin-manager/check-plugin-updates")
+                .then(response => response.json())
+                .then(data => {
+                    const updateResultsDiv = document.getElementById("update-results");
+                    updateResultsDiv.innerHTML = "";
+                    
+                    const updateCount = Object.keys(data).length;
+                    document.getElementById('updates-count').textContent = updateCount;
+                    
+                    if (updateCount === 0) {
+                        showNotification("All plugins are up to date!", "success");
+                    } else {
+                        showNotification(`${updateCount} update(s) available`, "warning");
+                        
+                        for (const plugin in data) {
+                            const updateItem = document.createElement('div');
+                            updateItem.className = 'update-item';
+                            updateItem.innerHTML = `
+                                <div class="update-info">
+                                    <div class="plugin-name">${plugin}</div>
+                                    <div class="update-versions">
+                                        <span class="version-current">Current: ${data[plugin].current_version}</span>
+                                        →
+                                        <span class="version-latest">Latest: ${data[plugin].latest_version}</span>
+                                    </div>
+                                </div>
+                                <button class="btn btn-primary btn-sm" onclick="upgradePlugin('${plugin}')">
+                                    Update Now
+                                </button>
+                            `;
+                            updateResultsDiv.appendChild(updateItem);
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error("Error checking for updates:", error);
+                    showNotification("Failed to check for updates", "error");
+                });
+        }
+        
+        // Upgrade plugin
+        window.upgradePlugin = function(pluginName) {
+            showNotification(`Upgrading ${pluginName}...`, "success");
+            
+            fetch(`/plugin-manager/upgrade-plugin?name=${pluginName}`, {
+                method: 'POST',
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    showNotification(data.error, "error");
+                } else {
+                    showNotification(`Successfully upgraded ${pluginName}!`, "success");
+                    fetchInstalledPlugins();
+                    checkForPluginUpdates();
+                }
+            })
+            .catch(error => {
+                console.error('Error upgrading plugin:', error);
+                showNotification(`Failed to upgrade ${pluginName}`, "error");
+            });
+        };
+        
+        // Search functionality
+        document.getElementById('plugin-search').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            
+            document.querySelectorAll('.plugin-item').forEach(item => {
+                const name = item.dataset.name;
+                if (name.includes(searchTerm)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+        
+        // Filter buttons
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                currentFilter = this.dataset.filter;
+                applyFilter();
+            });
+        });
+        
+        // Apply filter function
+        function applyFilter() {
+            const installedSection = document.querySelector('#installed-plugins').closest('.section-card');
+            const availableSection = document.querySelector('#available-plugins').closest('.section-card');
+            
+            switch(currentFilter) {
+                case 'all':
+                    installedSection.style.display = '';
+                    availableSection.style.display = '';
+                    break;
+                case 'installed':
+                    installedSection.style.display = '';
+                    availableSection.style.display = 'none';
+                    break;
+                case 'available':
+                    installedSection.style.display = 'none';
+                    availableSection.style.display = '';
+                    break;
+                case 'updates':
+                    // Show only installed section and check for updates
+                    installedSection.style.display = '';
+                    availableSection.style.display = 'none';
+                    checkForPluginUpdates();
+                    break;
+                case 'popular':
+                    // For now, show all - could implement popularity sorting later
+                    installedSection.style.display = '';
+                    availableSection.style.display = '';
+                    break;
+            }
+        }
+        
+        // Event listeners
+        document.getElementById("check-updates-btn").addEventListener("click", checkForPluginUpdates);
+        document.getElementById("refresh-available-btn").addEventListener("click", fetchAvailablePlugins);
+        
+        // Initial load
+        fetchInstalledPlugins();
+        fetchAvailablePlugins();
+    });
+    </script>
 </body>
 </html>
-

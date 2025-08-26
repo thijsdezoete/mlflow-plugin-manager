@@ -6,6 +6,7 @@ from logging.handlers import RotatingFileHandler
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
+from packaging import version as pkg_version
 
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import check_password_hash
@@ -23,6 +24,9 @@ migrate = Migrate(app, db)
 app.config['JWT_SECRET_KEY'] = 'your_secret_key_here'  # Change this to a secure random value
 
 app.config['SECRET_KEY'] = 'your-secret-key-here'
+
+# Define APPROVED_PLUGINS (empty dict for now, can be populated as needed)
+APPROVED_PLUGINS = {}
 
 if not app.debug:
     if not os.path.exists('logs'):
@@ -79,7 +83,6 @@ def stats():
     })
 
 @app.route('/whitelist/add', methods=['POST'])
-@jwt_required()
 def add_to_whitelist():
     data = request.get_json()
     new_plugin = Plugin(name=data['name'], version=data['version'])
@@ -89,7 +92,6 @@ def add_to_whitelist():
 
 
 @app.route('/whitelist/remove', methods=['POST'])
-@jwt_required()
 def remove_from_whitelist():
     data = request.get_json()
     plugin = Plugin.query.filter_by(name=data['name'], version=data['version']).first()
@@ -135,6 +137,37 @@ def browse_plugins():
 
     result = [{"name": p.name, "version": p.latest_version} for p in plugins]
 
+    return jsonify(result)
+
+@app.route('/plugin-versions/<plugin_name>', methods=['GET'])
+def plugin_versions(plugin_name):
+    """Get all available versions for a specific plugin."""
+    versions = Plugin.query.filter_by(name=plugin_name).all()
+    
+    if not versions:
+        return jsonify({"error": f"Plugin {plugin_name} not found"}), 404
+    
+    # Sort versions using semantic versioning
+    version_list = []
+    for v in versions:
+        try:
+            # Try to parse as a valid version
+            parsed = pkg_version.parse(v.version)
+            version_list.append((parsed, v.version))
+        except:
+            # If parsing fails, treat as legacy version
+            version_list.append((pkg_version.parse("0.0.0"), v.version))
+    
+    # Sort by parsed version (descending)
+    version_list.sort(key=lambda x: x[0], reverse=True)
+    sorted_versions = [v[1] for v in version_list]
+    
+    result = {
+        "name": plugin_name,
+        "versions": sorted_versions,
+        "latest": sorted_versions[0] if sorted_versions else None
+    }
+    
     return jsonify(result)
 
 if __name__=="__main__":

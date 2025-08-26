@@ -1,10 +1,17 @@
-from mlflow_plugin_manager import app
 from flask import Blueprint, jsonify, render_template, request
 import subprocess
 import requests
 from packaging import version
+import os
 
-plugin_api = Blueprint('plugin_api', __name__ )
+# Get the directory of this file to find templates relative to it
+current_dir = os.path.dirname(os.path.abspath(__file__))
+template_dir = os.path.join(os.path.dirname(current_dir), 'templates')
+
+plugin_api = Blueprint('plugin_api', __name__, template_folder=template_dir)
+
+# Get the plugin server URL from environment or use production default
+PLUGIN_SERVER_URL = os.environ.get('PLUGIN_SERVER_URL', 'https://api.mlflowplugins.com')
 
 @plugin_api.route('/')
 def index():
@@ -14,16 +21,33 @@ def index():
 @plugin_api.route('/available-plugins', methods=['GET'])
 def available_plugins():
     try:
-        response = requests.get("http://localhost:5001/browse-plugins")
-        # response = requests.get("https://plugin.mlflowplugins.com/browse-plugins")
+        response = requests.get(f"{PLUGIN_SERVER_URL}/browse-plugins", timeout=5)
 
         if response.status_code == 200:
             plugins = list([{'name': plugin['name'], "version": plugin['version']} for plugin in response.json()])
             return jsonify(plugins)
+    except requests.exceptions.ConnectionError:
+        # Return empty list if server is not available (for testing)
+        print(f"Warning: Could not connect to {PLUGIN_SERVER_URL}")
+        return jsonify([])
+    except Exception as e:
+        print(f"Error fetching plugins: {e}")
+        return jsonify([])
+
+@plugin_api.route('/plugin-versions/<plugin_name>', methods=['GET'])
+def plugin_versions(plugin_name):
+    """Get all available versions for a specific plugin."""
+    try:
+        response = requests.get(f"{PLUGIN_SERVER_URL}/plugin-versions/{plugin_name}")
+        
+        if response.status_code == 200:
+            return jsonify(response.json())
+        elif response.status_code == 404:
+            return jsonify({"error": f"Plugin {plugin_name} not found"}), 404
     except Exception as e:
         print(e)
         pass
-    return jsonify({"error": "Failed to fetch available plugins from server."}), 500
+    return jsonify({"error": f"Failed to fetch versions for {plugin_name}"}), 500
 
 
 @plugin_api.route('/installed-plugins', methods=['GET'])
@@ -50,10 +74,14 @@ def installed_plugins():
 
         
         all_plugins = mlflow_plugins + plugin_mlflow + mlflow_plugins_non_conformative
+        
+        # Filter out None values
+        all_plugins = [p for p in all_plugins if p is not None]
 
         unique_plugins = {}
         for plugin in all_plugins:
-            unique_plugins[plugin["name"]] = plugin
+            if plugin and "name" in plugin:  # Extra safety check
+                unique_plugins[plugin["name"]] = plugin
 
         plugins = list(unique_plugins.values())
 
@@ -67,16 +95,25 @@ def installed_plugins():
 @plugin_api.route('/install-plugin', methods=['POST'])
 def install_plugin():
     plugin_name = request.args.get('name')
+    version = request.args.get('version')
+    
     if not plugin_name:
         return jsonify({"error": "Plugin name is required."}), 400
 
-    # response = requests.get(f"https://plugin.mlflowplugins.com/is-approved?name={plugin_name}")
+    # Uncomment to enable plugin approval check
+    # response = requests.get(f"{PLUGIN_SERVER_URL}/is-approved?name={plugin_name}")
     # if response.status_code != 200 or not response.json().get("approved"):
     #     return jsonify({"error": f"Plugin {plugin_name} is not approved for installation."}), 403
 
     try:
-        result = subprocess.run(["pip", "install", plugin_name], check=True, text=True, capture_output=True)
-        return jsonify({"message": f"Successfully installed {plugin_name}!\n{result.stdout}"}), 200
+        # If version is specified, install specific version
+        if version and version != 'latest':
+            install_spec = f"{plugin_name}=={version}"
+        else:
+            install_spec = plugin_name
+            
+        result = subprocess.run(["pip", "install", install_spec], check=True, text=True, capture_output=True)
+        return jsonify({"message": f"Successfully installed {install_spec}!\n{result.stdout}"}), 200
 
     except subprocess.CalledProcessError as e:
         return jsonify({"error": f"Failed to install {plugin_name}. Error:\n{e.stderr}"}), 500

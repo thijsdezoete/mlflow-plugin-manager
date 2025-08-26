@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="MLflow Plugin Manager - Install, update, and manage MLflow plugins directly from the MLflow UI. No more manual pip commands.">
+    <meta name="keywords" content="MLflow, plugin manager, machine learning, ML tools, package manager">
+    <title>MLflow Plugin Manager - Seamless Plugin Management for MLflow</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1890ff;
+            --secondary: #43a2ff;
+            --dark: #1e1e1e;
+            --light: #f5f5f5;
+            --gray: #8b92a8;
+            --success: #52c41a;
+            --warning: #faad14;
+            --danger: #f5222d;
+            --border: #e8e8e8;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 85vh;
+            background: linear-gradient(135deg, #1890ff 0%, #43a2ff 100%);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            color: white;
+            margin-bottom: 1rem;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 2rem;
+            animation: slideUp 0.8s ease-out 0.2s backwards;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeIn 0.8s ease-out 0.4s backwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: white;
+            color: var(--primary);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: white;
+            color: var(--primary);
+        }
+
+        /* Stats Section */
+        .stats {
+            background: white;
+            padding: 4rem 2rem;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .stats-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 2rem;
+            background: var(--light);
+            border-radius: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            color: var(--gray);
+            font-size: 1.1rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 5rem 2rem;
+            background: var(--light);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--gray);
+            margin-bottom: 3rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+
+        .feature-description {
+            color: var(--gray);
+            line-height: 1.6;
+        }
+
+        /* Screenshots Section */
+        .screenshots {
+            padding: 5rem 2rem;
+            background: white;
+        }
+
+        .screenshots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .screenshot-card {
+            background: var(--light);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .screenshot-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        .screenshot-card h3 {
+            padding: 1rem 1.5rem;
+            background: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .screenshot-card img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .screenshot-card p {
+            padding: 1rem 1.5rem;
+            color: var(--gray);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            background: white;
+        }
+
+        /* Demo Section */
+        .demo {
+            padding: 5rem 2rem;
+            background: var(--light);
+        }
+
+        .demo-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--light);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .demo-window {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .demo-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .demo-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .demo-content {
+            padding: 2rem;
+            background: #1E293B;
+            color: #10B981;
+            font-family: 'Monaco', 'Courier New', monospace;
+            min-height: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .code-line {
+            margin: 0.5rem 0;
+            opacity: 0;
+            animation: typeIn 0.5s ease forwards;
+        }
+
+        .code-line:nth-child(1) { animation-delay: 0.5s; }
+        .code-line:nth-child(2) { animation-delay: 1s; }
+        .code-line:nth-child(3) { animation-delay: 1.5s; }
+        .code-line:nth-child(4) { animation-delay: 2s; }
+        .code-line:nth-child(5) { animation-delay: 2.5s; }
+
+        @keyframes typeIn {
+            to { opacity: 1; }
+        }
+
+        .prompt { color: #F59E0B; }
+        .command { color: #10B981; }
+        .output { color: #94A3B8; }
+
+        /* Technical Specs Section */
+        .specs {
+            padding: 5rem 2rem;
+            background: white;
+        }
+
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .spec-card {
+            background: var(--light);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .spec-card h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .spec-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .spec-card li {
+            padding: 0.5rem 0;
+            color: var(--gray);
+            border-bottom: 1px solid var(--border);
+            font-size: 0.95rem;
+        }
+
+        .spec-card li:last-child {
+            border-bottom: none;
+        }
+
+        .spec-card code {
+            background: rgba(24, 144, 255, 0.1);
+            color: var(--primary);
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            display: inline-block;
+            margin: 0.2rem 0;
+            border: 1px solid rgba(24, 144, 255, 0.2);
+        }
+
+        /* Installation Section */
+        .installation {
+            padding: 5rem 2rem;
+            background: var(--light);
+        }
+
+        .install-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .step {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            position: relative;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin: 0 auto 1rem;
+        }
+
+        .step-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .code-block {
+            background: rgba(24, 144, 255, 0.05);
+            color: var(--primary);
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            margin-top: 1rem;
+            position: relative;
+            overflow-x: auto;
+            border: 1px solid rgba(24, 144, 255, 0.2);
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--secondary);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>MLflow Plugin Manager</h1>
+            <p class="hero-subtitle">PyPI package management integrated directly into MLflow's web interface</p>
+            <div class="cta-buttons">
+                <a href="https://github.com/thijsdezoete/mlflow-plugin-manager" class="btn btn-primary">
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+                    </svg>
+                    View on GitHub
+                </a>
+                <a href="#installation" class="btn btn-secondary">Get Started</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="stats-grid">
+            <div class="stat-card fade-in">
+                <div class="stat-number">173</div>
+                <div class="stat-label">MLflow Packages on PyPI</div>
+            </div>
+            <div class="stat-card fade-in">
+                <div class="stat-number">pip</div>
+                <div class="stat-label">Standard Package Manager</div>
+            </div>
+            <div class="stat-card fade-in">
+                <div class="stat-number">Version</div>
+                <div class="stat-label">Control & Rollback</div>
+            </div>
+            <div class="stat-card fade-in">
+                <div class="stat-number">API</div>
+                <div class="stat-label">REST Endpoints</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <h2 class="section-title">Core Functionality</h2>
+            <p class="section-subtitle">Package management capabilities integrated with MLflow</p>
+            
+            <div class="features-grid">
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">📦</div>
+                    <h3 class="feature-title">Direct PyPI Integration</h3>
+                    <p class="feature-description">Install any MLflow-compatible package from PyPI through the web interface. Uses standard pip under the hood.</p>
+                </div>
+
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">🔄</div>
+                    <h3 class="feature-title">Version Comparison</h3>
+                    <p class="feature-description">Compare installed versions against latest PyPI releases. Update individual packages or process batch updates.</p>
+                </div>
+
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">🎯</div>
+                    <h3 class="feature-title">Version Pinning</h3>
+                    <p class="feature-description">Install specific package versions for reproducibility. Switch between versions or rollback as needed.</p>
+                </div>
+
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">🔍</div>
+                    <h3 class="feature-title">Package Discovery</h3>
+                    <p class="feature-description">Search and filter MLflow-compatible packages indexed from PyPI. View package metadata and dependency information.</p>
+                </div>
+
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">📝</div>
+                    <h3 class="feature-title">Installation Logs</h3>
+                    <p class="feature-description">View pip stdout/stderr output for all operations. Debug installation issues with complete command output.</p>
+                </div>
+
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">🔧</div>
+                    <h3 class="feature-title">REST API</h3>
+                    <p class="feature-description">Programmatic access via Flask REST endpoints. Integrate package management into CI/CD pipelines.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Screenshots Section -->
+    <section class="screenshots">
+        <div class="container">
+            <h2 class="section-title">Interface Screenshots</h2>
+            <p class="section-subtitle">MLflow Plugin Manager integrated with MLflow 3.0+ UI</p>
+            
+            <div class="screenshots-grid">
+                <div class="screenshot-card fade-in">
+                    <h3>Dashboard View</h3>
+                    <img src="assets/landing-assets-plugin-manager-dashboard.png" alt="Plugin Manager Dashboard" loading="lazy">
+                    <p>Main dashboard showing installed packages, available updates, and PyPI repository browser</p>
+                </div>
+                
+                <div class="screenshot-card fade-in">
+                    <h3>Update Detection</h3>
+                    <img src="assets/landing-assets-plugin-updates-available.png" alt="Updates Available" loading="lazy">
+                    <p>Automatic version comparison showing outdated packages with one-click update functionality</p>
+                </div>
+                
+                <div class="screenshot-card fade-in">
+                    <h3>Package Details</h3>
+                    <img src="assets/landing-assets-plugin-detail-modal.png" alt="Plugin Detail Modal" loading="lazy">
+                    <p>Detailed package information with version history and PyPI metadata</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Section -->
+    <section class="demo">
+        <div class="container">
+            <h2 class="section-title">Quick Start</h2>
+            <p class="section-subtitle">Launch MLflow with integrated package management</p>
+            
+            <div class="demo-container fade-in">
+                <div class="demo-window">
+                    <div class="demo-header">
+                        <div class="demo-dot"></div>
+                        <div class="demo-dot"></div>
+                        <div class="demo-dot"></div>
+                    </div>
+                    <div class="demo-content">
+                        <div class="code-line">
+                            <span class="prompt">$</span> <span class="command">pip install -e .</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="output"># Install the plugin manager package</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="prompt">$</span> <span class="command">mlflow server --app-name plugin_manager</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="output"># Server running at http://localhost:5000</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="output"># Plugin manager at http://localhost:5000/plugin-manager/</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technical Specs Section -->
+    <section class="specs">
+        <div class="container">
+            <h2 class="section-title">Technical Architecture</h2>
+            <p class="section-subtitle">Implementation details and system requirements</p>
+            
+            <div class="specs-grid">
+                <div class="spec-card fade-in">
+                    <h3>Backend Stack</h3>
+                    <ul>
+                        <li>Flask Blueprint for MLflow integration</li>
+                        <li>SQLAlchemy for package metadata storage</li>
+                        <li>Subprocess calls to pip for package operations</li>
+                        <li>REST API endpoints for all operations</li>
+                    </ul>
+                </div>
+                
+                <div class="spec-card fade-in">
+                    <h3>Frontend Integration</h3>
+                    <ul>
+                        <li>Vanilla JavaScript (no framework dependencies)</li>
+                        <li>MLflow 3.0+ compatible UI components</li>
+                        <li>Responsive design matching MLflow theme</li>
+                        <li>Real-time WebSocket updates (optional)</li>
+                    </ul>
+                </div>
+                
+                <div class="spec-card fade-in">
+                    <h3>API Endpoints</h3>
+                    <ul>
+                        <li><code>GET /plugin-manager/installed-plugins</code></li>
+                        <li><code>GET /plugin-manager/available-plugins</code></li>
+                        <li><code>POST /plugin-manager/install-plugin</code></li>
+                        <li><code>POST /plugin-manager/uninstall-plugin</code></li>
+                        <li><code>GET /plugin-manager/check-updates</code></li>
+                    </ul>
+                </div>
+                
+                <div class="spec-card fade-in">
+                    <h3>Requirements</h3>
+                    <ul>
+                        <li>Python 3.8+</li>
+                        <li>MLflow 2.0+ (optimized for 3.0+)</li>
+                        <li>pip package manager</li>
+                        <li>SQLite for metadata storage</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Installation Section -->
+    <section class="installation" id="installation">
+        <div class="container">
+            <h2 class="section-title">Installation</h2>
+            <p class="section-subtitle">Plugin metadata served by api.mlflowplugins.com - packages install locally via pip</p>
+            
+            <div class="install-steps">
+                <div class="step fade-in">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title">Clone Repository</h3>
+                    <div class="code-block">
+                        git clone https://github.com/thijsdezoete/mlflow-plugin-manager.git
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                </div>
+
+                <div class="step fade-in">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title">Install Package</h3>
+                    <div class="code-block">
+                        cd mlflow-plugin-manager<br>
+                        pip install -e .
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                </div>
+
+                <div class="step fade-in">
+                    <div class="step-number">3</div>
+                    <h3 class="step-title">Launch MLflow</h3>
+                    <div class="code-block">
+                        mlflow server --app-name plugin_manager
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-links">
+            <a href="https://github.com/thijsdezoete/mlflow-plugin-manager">GitHub</a>
+            <a href="https://github.com/thijsdezoete/mlflow-plugin-manager/blob/master/README.md">Documentation</a>
+            <a href="https://github.com/thijsdezoete/mlflow-plugin-manager/issues">Issues</a>
+            <a href="https://mlflow.org">MLflow</a>
+        </div>
+        <p>&copy; 2024 MLflow Plugin Manager. MIT License.</p>
+    </footer>
+
+    <script>
+        // Intersection Observer for fade-in animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Copy code functionality
+        function copyCode(button) {
+            const codeBlock = button.parentElement;
+            const code = codeBlock.textContent.replace('Copy', '').trim();
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = 'Copied!';
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                }, 2000);
+            });
+        }
+
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
