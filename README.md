@@ -6,7 +6,7 @@
 
 **PyPI package management integrated directly into MLflow's web interface**
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Install from PyPI (Recommended)
 ```bash
@@ -20,16 +20,26 @@ cd mlflow-plugin-manager
 pip install -e .
 ```
 
-## 📦 Core Features
+### Docker
+```bash
+# Using docker compose
+docker compose up -d
 
-- **📦 Direct PyPI Integration** - Install any MLflow-compatible package from PyPI through the web interface
-- **🔄 Version Management** - Compare installed versions against latest PyPI releases, update or rollback as needed
-- **🎯 Version Pinning** - Install specific package versions for reproducibility
-- **🔍 Package Discovery** - Browse and search MLflow packages indexed from PyPI
-- **📝 Installation Logs** - View complete pip output for debugging
-- **🔧 REST API** - Programmatic access for CI/CD integration
+# Or using make
+make docker-build
+make docker-run
+```
 
-## 🎮 Usage
+## Core Features
+
+- **Direct PyPI Integration** - Install any MLflow-compatible package from PyPI through the web interface
+- **Version Management** - Compare installed versions against latest PyPI releases, update or rollback as needed
+- **Version Pinning** - Install specific package versions for reproducibility
+- **Package Discovery** - Browse and search MLflow packages indexed from PyPI
+- **Installation Logs** - View complete pip output for debugging
+- **REST API** - Programmatic access for CI/CD integration
+
+## Usage
 
 Run the MLflow server with the Plugin Manager:
 
@@ -42,7 +52,7 @@ Access the Plugin Manager at:
 - Plugin Manager: http://localhost:5000/plugin-manager/
 - Click "Plugins" in the sidebar for quick access
 
-## ⚙️ Configuration
+## Configuration
 
 ### Environment Variables
 
@@ -59,7 +69,28 @@ export PLUGIN_SERVER_URL="http://localhost:5001"
 mlflow server --app-name plugin_manager
 ```
 
-## 🏗️ Architecture
+## Make Commands
+
+```bash
+make help         # Show all available commands
+
+# Development
+make install      # Install in development mode
+make dev          # Run MLflow with plugin manager
+make test         # Run test suite
+make lint         # Run linting
+
+# Docker
+make docker-build # Build Docker image
+make docker-run   # Start container
+make docker-stop  # Stop container
+
+# Testing MLflow Versions
+make test-mlflow2 # Test with MLflow 2.x
+make test-mlflow3 # Test with MLflow 3.x
+```
+
+## Architecture
 
 The MLflow Plugin Manager consists of two components:
 
@@ -68,7 +99,7 @@ The MLflow Plugin Manager consists of two components:
 
 > **Note**: Package installation happens locally on your machine. The remote server only provides plugin metadata (available packages, versions, etc.).
 
-## 🔌 API Endpoints
+## API Endpoints
 
 - `GET /plugin-manager/` - Web interface
 - `GET /plugin-manager/installed-plugins` - List installed packages
@@ -78,13 +109,22 @@ The MLflow Plugin Manager consists of two components:
 - `GET /plugin-manager/check-plugin-updates` - Check for updates
 - `POST /plugin-manager/upgrade-plugin` - Update a package
 
-## 📋 Requirements
+## Requirements
 
-- Python 3.8+
-- MLflow 2.0+ (optimized for 3.0+)
+- Python 3.10+
+- MLflow 2.0+ (fully compatible with MLflow 3.x)
 - pip package manager
 
-## 🔧 Advanced: Running Your Own Metadata Server
+### MLflow Version Compatibility
+
+| MLflow Version | Server Type | Status |
+|----------------|-------------|--------|
+| 2.x | Flask/Gunicorn | Supported |
+| 3.x | FastAPI/Uvicorn | Supported |
+
+The plugin auto-detects the MLflow version and adapts accordingly.
+
+## Advanced: Running Your Own Metadata Server
 
 For maintainers who want to run their own plugin metadata server:
 
@@ -96,19 +136,17 @@ python app.py              # Run metadata server on port 5001
 
 > **Note**: End users don't need to run these commands - the default configuration uses api.mlflowplugins.com.
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## 📝 License
+## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## 🔗 Links
+## Links
 
 - [GitHub Repository](https://github.com/thijsdezoete/mlflow-plugin-manager)
 - [PyPI Package](https://pypi.org/project/mlflow-plugin-manager/)
 - [Issue Tracker](https://github.com/thijsdezoete/mlflow-plugin-manager/issues)
 - [MLflow Documentation](https://mlflow.org)
-
-

@@ -1,0 +1,11 @@
+name = "mlflow-plugin-api"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+[vars]
+ENVIRONMENT = "production"
+
+# Custom domain routing
+routes = [
+  { pattern = "api.mlflowplugins.com/*", zone_name = "mlflowplugins.com" }
+]

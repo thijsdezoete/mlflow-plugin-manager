@@ -1,4 +1,7 @@
-{
+// MLflow Plugin Manager API - Cloudflare Worker
+// PLUGIN_DATA is injected by export_to_worker.py
+
+const PLUGIN_DATA = {
   "aimlflow": {
     "name": "aimlflow",
     "versions": [
@@ -1953,4 +1956,70 @@
     ],
     "latest": "0.0.9"
   }
-}
+};
+
+var worker_default = {
+  async fetch(request, env, ctx) {
+    const url = new URL(request.url);
+    const headers = {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+      "Content-Type": "application/json",
+      "Cache-Control": "public, max-age=3600"
+    };
+    if (request.method === "OPTIONS") {
+      return new Response(null, { headers });
+    }
+    if (url.pathname === "/browse-plugins") {
+      const plugins = Object.values(PLUGIN_DATA).map((plugin) => ({
+        name: plugin.name,
+        version: plugin.latest
+      }));
+      return new Response(JSON.stringify(plugins), { headers });
+    }
+    const versionMatch = url.pathname.match(/^\/plugin-versions\/(.+)$/);
+    if (versionMatch) {
+      const pluginName = versionMatch[1];
+      const plugin = PLUGIN_DATA[pluginName];
+      if (!plugin) {
+        return new Response(
+          JSON.stringify({ error: `Plugin ${pluginName} not found` }),
+          { status: 404, headers }
+        );
+      }
+      return new Response(JSON.stringify({
+        name: plugin.name,
+        versions: plugin.versions,
+        latest: plugin.latest
+      }), { headers });
+    }
+    if (url.pathname === "/is-approved") {
+      const pluginName = url.searchParams.get("name");
+      const approved = pluginName && PLUGIN_DATA.hasOwnProperty(pluginName);
+      return new Response(
+        JSON.stringify({ approved }),
+        { headers }
+      );
+    }
+    if (url.pathname === "/") {
+      return new Response(JSON.stringify({
+        status: "ok",
+        message: "MLflow Plugin Manager API",
+        endpoints: [
+          "/browse-plugins",
+          "/plugin-versions/{plugin_name}",
+          "/is-approved?name={plugin_name}"
+        ]
+      }), { headers });
+    }
+    return new Response(
+      JSON.stringify({ error: "Not found" }),
+      { status: 404, headers }
+    );
+  }
+};
+
+export {
+  worker_default as default
+};

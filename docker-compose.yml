@@ -1,0 +1,48 @@
+# MLflow Plugin Manager - Docker Compose
+# =======================================
+# Run: docker compose up -d
+
+services:
+  mlflow:
+    build:
+      context: .
+      args:
+        PYTHON_VERSION: "3.12"
+        MLFLOW_VERSION: "3.8.0"
+    container_name: mlflow-plugin-manager
+    ports:
+      - "5001:5000"
+    volumes:
+      - mlflow-data:/home/mlflow/mlruns
+      - mlflow-artifacts:/home/mlflow/mlartifacts
+    environment:
+      - MLFLOW_TRACKING_URI=sqlite:///mlruns/mlflow.db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Optional: Plugin metadata server (for local development)
+  # Uncomment to run your own plugin index
+  # metadata-server:
+  #   build:
+  #     context: ./server
+  #     dockerfile: Dockerfile
+  #   container_name: mlflow-plugin-server
+  #   ports:
+  #     - "5001:5001"
+  #   volumes:
+  #     - plugin-db:/app/data
+  #   environment:
+  #     - FLASK_ENV=production
+
+volumes:
+  mlflow-data:
+    driver: local
+  mlflow-artifacts:
+    driver: local
+  # plugin-db:
+  #   driver: local

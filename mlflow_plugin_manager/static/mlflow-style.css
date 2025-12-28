@@ -1,7 +1,7 @@
 /* MLflow 3 Matching Styles for Plugin Manager */
 
 :root {
-    /* MLflow 3 Color Palette */
+    /* MLflow 3 Color Palette - Light Mode */
     --primary-color: #1890ff;
     --primary-hover: #40a9ff;
     --primary-active: #096dd9;
@@ -17,6 +17,86 @@
     --warning-color: #faad14;
     --header-height: 56px;
     --sidebar-width: 200px;
+    --modal-backdrop: rgba(0, 0, 0, 0.5);
+    --code-background: #1e1e1e;
+    --code-text: #d4d4d4;
+    --update-bg: #fff7e6;
+    --update-border: #ffd591;
+    --table-hover: #fafafa;
+    --table-header: #fafafa;
+}
+
+/* Dark Mode - System Preference */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --primary-color: #177ddc;
+        --primary-hover: #3c9ae8;
+        --primary-active: #1765ad;
+        --background: #141414;
+        --card-background: #1f1f1f;
+        --text-primary: #e6e6e6;
+        --text-secondary: #a6a6a6;
+        --text-tertiary: #595959;
+        --border-color: #434343;
+        --border-color-light: #303030;
+        --success-color: #49aa19;
+        --danger-color: #d32029;
+        --warning-color: #d89614;
+        --modal-backdrop: rgba(0, 0, 0, 0.7);
+        --code-background: #0d0d0d;
+        --code-text: #d4d4d4;
+        --update-bg: #2b2111;
+        --update-border: #594214;
+        --table-hover: #262626;
+        --table-header: #262626;
+    }
+}
+
+/* Manual Dark Mode Toggle Support */
+[data-theme="dark"] {
+    --primary-color: #177ddc;
+    --primary-hover: #3c9ae8;
+    --primary-active: #1765ad;
+    --background: #141414;
+    --card-background: #1f1f1f;
+    --text-primary: #e6e6e6;
+    --text-secondary: #a6a6a6;
+    --text-tertiary: #595959;
+    --border-color: #434343;
+    --border-color-light: #303030;
+    --success-color: #49aa19;
+    --danger-color: #d32029;
+    --warning-color: #d89614;
+    --modal-backdrop: rgba(0, 0, 0, 0.7);
+    --code-background: #0d0d0d;
+    --code-text: #d4d4d4;
+    --update-bg: #2b2111;
+    --update-border: #594214;
+    --table-hover: #262626;
+    --table-header: #262626;
+}
+
+[data-theme="light"] {
+    --primary-color: #1890ff;
+    --primary-hover: #40a9ff;
+    --primary-active: #096dd9;
+    --background: #f5f5f5;
+    --card-background: #ffffff;
+    --text-primary: #262626;
+    --text-secondary: #8c8c8c;
+    --text-tertiary: #bfbfbf;
+    --border-color: #d9d9d9;
+    --border-color-light: #f0f0f0;
+    --success-color: #52c41a;
+    --danger-color: #ff4d4f;
+    --warning-color: #faad14;
+    --modal-backdrop: rgba(0, 0, 0, 0.5);
+    --code-background: #1e1e1e;
+    --code-text: #d4d4d4;
+    --update-bg: #fff7e6;
+    --update-border: #ffd591;
+    --table-hover: #fafafa;
+    --table-header: #fafafa;
 }
 
 * {
@@ -431,8 +511,8 @@ body {
 }
 
 .update-item {
-    background: #fff7e6;
-    border: 1px solid #ffd591;
+    background: var(--update-bg);
+    border: 1px solid var(--update-border);
     border-radius: 2px;
     padding: 12px 16px;
     margin-bottom: 8px;
@@ -562,7 +642,7 @@ body {
 }
 
 .data-table th {
-    background: #fafafa;
+    background: var(--table-header);
     border-bottom: 1px solid var(--border-color-light);
     padding: 12px 16px;
     text-align: left;
@@ -578,7 +658,7 @@ body {
 }
 
 .data-table tr:hover {
-    background: #fafafa;
+    background: var(--table-hover);
 }
 
 /* Modal Styles */
@@ -589,7 +669,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--modal-backdrop);
     z-index: 2000;
     align-items: center;
     justify-content: center;
@@ -659,8 +739,8 @@ body {
 }
 
 .log-output {
-    background: #1e1e1e;
-    color: #d4d4d4;
+    background: var(--code-background);
+    color: var(--code-text);
     padding: 16px;
     border-radius: 4px;
     font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
@@ -819,6 +899,68 @@ body {
 
 .plugin-link svg {
     flex-shrink: 0;
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 2px;
+    cursor: pointer;
+    color: var(--text-primary);
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.theme-toggle:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.theme-toggle svg {
+    width: 16px;
+    height: 16px;
+}
+
+.theme-toggle .sun-icon {
+    display: none;
+}
+
+.theme-toggle .moon-icon {
+    display: block;
+}
+
+[data-theme="dark"] .theme-toggle .sun-icon,
+@media (prefers-color-scheme: dark) {
+    .theme-toggle .sun-icon {
+        display: block;
+    }
+    .theme-toggle .moon-icon {
+        display: none;
+    }
+}
+
+[data-theme="light"] .theme-toggle .sun-icon {
+    display: none;
+}
+
+[data-theme="light"] .theme-toggle .moon-icon {
+    display: block;
+}
+
+[data-theme="dark"] .theme-toggle .moon-icon {
+    display: none;
+}
+
+/* Header Actions */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 /* Responsive Design */

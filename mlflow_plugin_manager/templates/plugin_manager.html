@@ -18,12 +18,30 @@
                 </svg>
                 Plugin Manager
             </h1>
-            <a href="/#/experiments" class="back-button">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M10 12L6 8L10 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                Back to MLflow
-            </a>
+            <div class="header-actions">
+                <button class="theme-toggle" id="theme-toggle" title="Toggle dark mode">
+                    <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                    </svg>
+                    <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5"/>
+                        <line x1="12" y1="1" x2="12" y2="3"/>
+                        <line x1="12" y1="21" x2="12" y2="23"/>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                        <line x1="1" y1="12" x2="3" y2="12"/>
+                        <line x1="21" y1="12" x2="23" y2="12"/>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                    </svg>
+                </button>
+                <a href="/#/experiments" class="back-button">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 12L6 8L10 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Back to MLflow
+                </a>
+            </div>
         </div>
 
         <!-- Main Content -->
@@ -221,12 +239,44 @@
     </div>
 
     <script>
+    // Theme handling - runs immediately to prevent flash
+    (function() {
+        const savedTheme = localStorage.getItem('plugin-manager-theme');
+        if (savedTheme) {
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        }
+    })();
+
     // Enhanced plugin manager with MLflow 3 styling
     document.addEventListener("DOMContentLoaded", function() {
         let allPlugins = [];
         let installedPlugins = [];
         let currentFilter = 'all';
         let confirmCallback = null;
+
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('plugin-manager-theme', theme);
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            if (currentTheme === 'dark') {
+                setTheme('light');
+            } else if (currentTheme === 'light') {
+                setTheme('dark');
+            } else {
+                // No manual theme set, check system preference
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                setTheme(prefersDark ? 'light' : 'dark');
+            }
+        }
+
+        if (themeToggle) {
+            themeToggle.addEventListener('click', toggleTheme);
+        }
         
         // Confirmation Modal Functions
         window.showConfirmModal = function(title, message, onConfirm, confirmBtnText = 'Confirm', confirmBtnClass = 'btn-primary') {
