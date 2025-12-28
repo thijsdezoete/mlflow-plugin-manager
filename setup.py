@@ -18,7 +18,7 @@ setup(
         "Source": "https://github.com/thijsdezoete/mlflow-plugin-manager",
     },
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "Intended Audience :: Science/Research",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
