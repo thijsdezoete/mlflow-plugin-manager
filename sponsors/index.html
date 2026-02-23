@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sponsor MLflow Plugin Manager - support open source MLflow tooling and get your brand in front of ML engineers.">
+    <title>Sponsor MLflow Plugin Manager</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #1890ff;
+            --secondary: #43a2ff;
+            --dark: #1e1e1e;
+            --light: #f5f5f5;
+            --gray: #8b92a8;
+            --border: #e8e8e8;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1890ff 0%, #43a2ff 100%);
+            padding: 4rem 2rem;
+            text-align: center;
+            color: white;
+        }
+        .header h1 { font-size: 2.5rem; font-weight: 800; margin-bottom: 0.5rem; }
+        .header p { font-size: 1.2rem; opacity: 0.9; max-width: 600px; margin: 0 auto; }
+        .header a { color: white; }
+
+        /* Content */
+        .container { max-width: 800px; margin: 0 auto; padding: 3rem 2rem; }
+
+        h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 2.5rem 0 1rem;
+            color: var(--dark);
+        }
+        h2:first-child { margin-top: 0; }
+
+        p { margin-bottom: 1rem; color: #444; }
+
+        /* Sponsor grid (empty state) */
+        .sponsors-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            justify-content: center;
+            padding: 3rem 1rem;
+            background: var(--light);
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            text-align: center;
+        }
+        .sponsors-grid .empty {
+            color: var(--gray);
+            font-size: 1.1rem;
+        }
+
+        /* Tiers */
+        .tiers {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        .tier {
+            background: var(--light);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+        .tier h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+        .tier .price {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+        }
+        .tier ul {
+            list-style: none;
+            padding: 0;
+        }
+        .tier li {
+            padding: 0.3rem 0;
+            color: #555;
+            font-size: 0.95rem;
+        }
+        .tier li:before {
+            content: "- ";
+            color: var(--primary);
+        }
+
+        /* CTA */
+        .cta {
+            background: var(--light);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            margin: 2.5rem 0;
+        }
+        .cta p { color: #444; margin-bottom: 1rem; }
+        .cta a.btn {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1.05rem;
+            transition: background 0.2s;
+        }
+        .cta a.btn:hover { background: var(--secondary); }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border);
+        }
+        footer a { color: var(--primary); text-decoration: none; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Sponsor MLflow Plugin Manager</h1>
+    <p>Support open source MLflow tooling. Get your brand in front of ML engineers.</p>
+</div>
+
+<div class="container">
+
+    <h2>Current Sponsors</h2>
+    <div class="sponsors-grid">
+        <!-- Sponsor logos go here when signed. Example:
+        <a href="https://sponsor.com"><img src="/media/sponsors/sponsor-logo.png" alt="Sponsor Name" height="50"></a>
+        -->
+        <p class="empty">Be the first sponsor. Your logo here.</p>
+    </div>
+
+    <h2>Why Sponsor?</h2>
+    <p>MLflow Plugin Manager makes MLflow's plugin ecosystem discoverable and installable from the web UI. ML engineers use it to find, compare, and install MLflow extensions without leaving their workflow.</p>
+    <p>Sponsoring puts your brand where ML engineers are actively making tooling decisions. It also supports the maintenance and growth of open source infrastructure the MLflow community depends on.</p>
+
+    <h2>Packages</h2>
+    <div class="tiers">
+        <div class="tier">
+            <h3>Pilot</h3>
+            <div class="price">$500 - 750/mo</div>
+            <ul>
+                <li>Logo on this page</li>
+                <li>Sponsor listing in README</li>
+                <li>Social media shoutout</li>
+            </ul>
+        </div>
+        <div class="tier">
+            <h3>Growth</h3>
+            <div class="price">$1,500 - 2,500/mo</div>
+            <ul>
+                <li>Everything in Pilot</li>
+                <li>Prominent logo placement</li>
+                <li>Sponsor blog post</li>
+                <li>Monthly analytics report</li>
+                <li>Roadmap input</li>
+            </ul>
+        </div>
+        <div class="tier">
+            <h3>Partner</h3>
+            <div class="price">$5,000+/mo</div>
+            <ul>
+                <li>Everything in Growth</li>
+                <li>Co-branded content</li>
+                <li>Early access to features</li>
+                <li>Quarterly strategy call</li>
+                <li>Custom integrations</li>
+            </ul>
+        </div>
+    </div>
+
+    <p>Open to GitHub Sponsors, one-time grants, or custom arrangements. First three sponsors get introductory pricing: 30% off for a 3-month commitment.</p>
+
+    <div class="cta">
+        <p>Interested? Let's talk.</p>
+        <a class="btn" href="mailto:thijs@mlflowplugins.com">Get in Touch</a>
+    </div>
+
+</div>
+
+<footer>
+    <a href="https://mlflowplugins.com">MLflow Plugin Manager</a> · <a href="https://github.com/thijsdezoete/mlflow-plugin-manager">GitHub</a> · MIT License
+</footer>
+
+</body>
+</html>
