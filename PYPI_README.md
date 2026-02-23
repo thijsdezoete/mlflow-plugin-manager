@@ -144,23 +144,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## Sponsors
-
-<p align="center">
-  <em>This project is supported by these awesome sponsors:</em>
-</p>
-
-<p align="center">
-  <!-- Sponsor logos go here. Example: -->
-  <!-- <a href="https://sponsor.com"><img src="media/sponsors/sponsor-logo.png" alt="Sponsor Name" height="60"></a> -->
-  <br>
-  <strong>Your logo here</strong> - <a href="https://mlflowplugins.com/sponsors">become a sponsor</a>
-</p>
-
-<p align="center">
-  <sub>Interested in sponsoring? See our <a href="https://mlflowplugins.com/sponsors">sponsor page</a> or <a href="mailto:thijs@mlflowplugins.com">get in touch</a>.</sub>
-</p>
-
 ## Links
 
 - [GitHub Repository](https://github.com/thijsdezoete/mlflow-plugin-manager)
